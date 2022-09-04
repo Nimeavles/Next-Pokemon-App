@@ -31,7 +31,7 @@ const PokemonPage: NextPage<Props> = ({ pokemon }) => {
         <Grid xs={12} sm={8}>
           <Card>
             <Card.Header
-              css={{ display: "flex", justifyContent: "space-between" }}
+              css={{ display: "flex", justifyContent: "space-between", '@sm': {flexDirection: 'column'}}}
             >
               <Text h1 transform="capitalize">
                 {pokemon.name}
