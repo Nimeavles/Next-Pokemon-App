@@ -6,7 +6,7 @@ import confetti from "canvas-confetti";
 import { pokeApi } from "../../api";
 import { Layout } from "../../components/layouts";
 import { Pokemon, PokemonListResponse, SmallPokemon } from "../../interfaces";
-import { localFavorites } from "../../utils";
+import { getPokemonInfo, localFavorites } from "../../utils";
 import { useState } from "react";
 
 interface Props {
@@ -121,25 +121,29 @@ export async function getStaticPaths(ctx: GetStaticPaths) {
         paths: pokemonNames.map( name => ({
           params: { name }
         })),
-        fallback: false
+        fallback: 'blocking'
     };
 }
 
 export const getStaticProps: GetStaticProps = async ({params}) => {
     const { name } = params as { name: string };
 
-    const { data } = await pokeApi.get<Pokemon>(`/pokemon/${ name }`);
-    
-    const pokemon = {
-      id: data.id,
-      name: data.name,
-      sprites: data.sprites
+    const pokemon = await getPokemonInfo( name );
+
+    if ( !pokemon ) {
+      return {
+        redirect: {
+          destination: '/',
+          permanent: false
+        }
+      }
     }
 
     return {
         props: {
             pokemon
-        }
+        },
+        revalidate: 86400,
     }
 }
 
